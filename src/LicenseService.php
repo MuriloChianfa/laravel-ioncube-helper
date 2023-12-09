@@ -110,7 +110,7 @@ abstract readonly class LicenseService
      */
     private static function serverIsAllowed(): bool
     {
-        if (in_array(Route::currentRouteName(), self::SERVERS_WHITELIST, true)) {
+        if (in_array(Route::currentRouteName(), static::SERVERS_WHITELIST, true)) {
             return true;
         }
 
@@ -144,7 +144,7 @@ abstract readonly class LicenseService
             }
 
             // Allowed servers by whitelisted routes
-            if (in_array(Route::currentRouteName(), self::SERVERS_WHITELIST, true)) {
+            if (in_array(Route::currentRouteName(), static::SERVERS_WHITELIST, true)) {
                 return true;
             }
         }
@@ -179,7 +179,7 @@ abstract readonly class LicenseService
      * @param bool $validate
      * @return string
      */
-    public static function getProperty(string $property, $default = false, bool $validate = true): string
+    public static function getProperty(string $property, $default = '', bool $validate = true): string
     {
         $properties = (object) self::getProperties($validate);
 
@@ -215,7 +215,10 @@ abstract readonly class LicenseService
      */
     public static function expireDate(bool $validate = true): string
     {
-        $fileInfo = ioncube_file_info();
+        if (!($fileInfo = ioncube_file_info())) {
+            return now()->format(self::DATE_FORMAT);
+        }
+
         return date(self::DATE_FORMAT, $fileInfo['FILE_EXPIRY']);
     }
 
